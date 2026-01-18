@@ -57,33 +57,57 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Brand colors
+        teal: {
+          DEFAULT: "hsl(var(--teal-deep))",
+          deep: "hsl(var(--teal-deep))",
+          light: "hsl(var(--teal-light))",
+        },
+        terracotta: {
+          DEFAULT: "hsl(var(--terracotta))",
+          dark: "hsl(var(--terracotta-dark))",
+        },
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          light: "hsl(var(--gold-light))",
+        },
+        cream: "hsl(var(--cream))",
+        charcoal: "hsl(var(--charcoal))",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
+      },
+      fontSize: {
+        "display-xl": ["4.5rem", { lineHeight: "1.1", letterSpacing: "-0.02em" }],
+        "display-lg": ["3.5rem", { lineHeight: "1.15", letterSpacing: "-0.02em" }],
+        "display-md": ["2.5rem", { lineHeight: "1.2", letterSpacing: "-0.01em" }],
+        "display-sm": ["1.875rem", { lineHeight: "1.3", letterSpacing: "-0.01em" }],
+      },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      boxShadow: {
+        "glow": "0 0 40px hsl(181 80% 26% / 0.15)",
+        "glow-lg": "0 0 60px hsl(181 80% 26% / 0.2)",
+        "card": "0 8px 24px -4px hsl(200 25% 15% / 0.12)",
+        "card-hover": "0 16px 48px -8px hsl(200 25% 15% / 0.18)",
       },
     },
   },
