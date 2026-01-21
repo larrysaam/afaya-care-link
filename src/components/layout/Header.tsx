@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Menu, X, Heart, User, LogOut } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navLinks = [
   { label: "How It Works", href: "/#how-it-works" },
@@ -13,6 +21,13 @@ const navLinks = [
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAdmin, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
@@ -53,12 +68,53 @@ export const Header = () => {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-4">
-            <Button variant="ghost" size="sm">
-              Sign In
-            </Button>
-            <Button variant="default" size="sm">
-              Get Started
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="max-w-[120px] truncate">
+                      {user.email?.split('@')[0]}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem asChild>
+                    <Link to="/my-consultations" className="cursor-pointer">
+                      My Consultations
+                    </Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/consultations" className="cursor-pointer">
+                          Admin Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link to="/auth">
+                  <Button variant="ghost" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/auth">
+                  <Button variant="default" size="sm">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -104,10 +160,39 @@ export const Header = () => {
                 )
               ))}
               <div className="flex flex-col gap-2 pt-4 border-t border-border mt-2">
-                <Button variant="ghost" className="justify-start">
-                  Sign In
-                </Button>
-                <Button variant="default">Get Started</Button>
+                {user ? (
+                  <>
+                    <Link to="/my-consultations" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        My Consultations
+                      </Button>
+                    </Link>
+                    {isAdmin && (
+                      <Link to="/admin/consultations" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="ghost" className="w-full justify-start">
+                          Admin Dashboard
+                        </Button>
+                      </Link>
+                    )}
+                    <Button variant="destructive" onClick={handleSignOut} className="justify-start">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="default" className="w-full">
+                        Get Started
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </motion.div>
@@ -116,3 +201,5 @@ export const Header = () => {
     </header>
   );
 };
+
+export default Header;
