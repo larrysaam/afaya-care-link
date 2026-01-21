@@ -92,8 +92,8 @@ export const HospitalCard = ({ hospital, index }: HospitalCardProps) => {
             <Button asChild variant="default" className="flex-1">
               <Link to={`/hospitals/${hospital.id}`}>View Profile</Link>
             </Button>
-            <Button variant="outline" className="flex-1">
-              Request Consult
+            <Button asChild variant="outline" className="flex-1">
+              <Link to={`/consultation/${hospital.id}`}>Request Consult</Link>
             </Button>
           </div>
         </CardContent>
