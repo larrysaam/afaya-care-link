@@ -103,10 +103,12 @@ const HospitalProfile = () => {
               </div>
 
               <div className="flex flex-col gap-3 lg:items-end">
-                <Button size="lg" className="w-full lg:w-auto">
-                  <Video className="w-4 h-4 mr-2" />
-                  Request Consultation
-                </Button>
+                <Link to={`/consultation/${hospital.id}`}>
+                  <Button size="lg" className="w-full lg:w-auto">
+                    <Video className="w-4 h-4 mr-2" />
+                    Schedule Consultation
+                  </Button>
+                </Link>
                 <Button size="lg" variant="outline" className="w-full lg:w-auto">
                   <Heart className="w-4 h-4 mr-2" />
                   Save Hospital
