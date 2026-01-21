@@ -88,7 +88,7 @@ export const Header = () => {
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link to="/admin/consultations" className="cursor-pointer">
+                        <Link to="/admin" className="cursor-pointer">
                           Admin Dashboard
                         </Link>
                       </DropdownMenuItem>
@@ -168,7 +168,7 @@ export const Header = () => {
                       </Button>
                     </Link>
                     {isAdmin && (
-                      <Link to="/admin/consultations" onClick={() => setIsMenuOpen(false)}>
+                      <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
                         <Button variant="ghost" className="w-full justify-start">
                           Admin Dashboard
                         </Button>

@@ -11,6 +11,8 @@ import Auth from "./pages/Auth";
 import ConsultationRequest from "./pages/ConsultationRequest";
 import MyConsultations from "./pages/MyConsultations";
 import AdminConsultations from "./pages/AdminConsultations";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,7 +31,9 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/consultation/:hospitalId" element={<ConsultationRequest />} />
             <Route path="/my-consultations" element={<MyConsultations />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/consultations" element={<AdminConsultations />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
