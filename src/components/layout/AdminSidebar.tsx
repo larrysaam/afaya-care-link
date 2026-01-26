@@ -4,7 +4,8 @@ import {
   Users, 
   FileText, 
   Home, 
-  ChevronLeft 
+  ChevronLeft,
+  Building2
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -30,6 +31,12 @@ const adminNavItems = [
     url: "/admin",
     icon: LayoutDashboard,
     roles: ["admin", "superadmin", "consultation_admin", "visa_admin", "accommodation_admin"],
+  },
+  {
+    title: "Hospitals",
+    url: "/admin/hospitals",
+    icon: Building2,
+    roles: ["admin", "superadmin"],
   },
   {
     title: "Consultations",

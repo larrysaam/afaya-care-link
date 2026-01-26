@@ -95,6 +95,93 @@ export type Database = {
         }
         Relationships: []
       }
+      hospitals: {
+        Row: {
+          accreditations: string[] | null
+          address: string | null
+          avg_cost_savings: number | null
+          beds: number | null
+          city: string
+          created_at: string
+          description: string | null
+          doctors_count: number | null
+          email: string | null
+          established: number | null
+          features: string[] | null
+          id: string
+          image_url: string | null
+          international_patients: number | null
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          phone: string | null
+          rating: number | null
+          review_count: number | null
+          slug: string
+          specialties: string[] | null
+          state: string
+          success_rate: number | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          accreditations?: string[] | null
+          address?: string | null
+          avg_cost_savings?: number | null
+          beds?: number | null
+          city: string
+          created_at?: string
+          description?: string | null
+          doctors_count?: number | null
+          email?: string | null
+          established?: number | null
+          features?: string[] | null
+          id?: string
+          image_url?: string | null
+          international_patients?: number | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          rating?: number | null
+          review_count?: number | null
+          slug: string
+          specialties?: string[] | null
+          state: string
+          success_rate?: number | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          accreditations?: string[] | null
+          address?: string | null
+          avg_cost_savings?: number | null
+          beds?: number | null
+          city?: string
+          created_at?: string
+          description?: string | null
+          doctors_count?: number | null
+          email?: string | null
+          established?: number | null
+          features?: string[] | null
+          id?: string
+          image_url?: string | null
+          international_patients?: number | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          rating?: number | null
+          review_count?: number | null
+          slug?: string
+          specialties?: string[] | null
+          state?: string
+          success_rate?: number | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       medical_documents: {
         Row: {
           consultation_id: string
@@ -171,6 +258,68 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      specialists: {
+        Row: {
+          available_days: string[] | null
+          bio: string | null
+          created_at: string
+          experience_years: number | null
+          hospital_id: string
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          languages: string[] | null
+          name: string
+          patients_treated: number | null
+          qualification: string | null
+          specialty: string
+          success_rate: number | null
+          updated_at: string
+        }
+        Insert: {
+          available_days?: string[] | null
+          bio?: string | null
+          created_at?: string
+          experience_years?: number | null
+          hospital_id: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          languages?: string[] | null
+          name: string
+          patients_treated?: number | null
+          qualification?: string | null
+          specialty: string
+          success_rate?: number | null
+          updated_at?: string
+        }
+        Update: {
+          available_days?: string[] | null
+          bio?: string | null
+          created_at?: string
+          experience_years?: number | null
+          hospital_id?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          languages?: string[] | null
+          name?: string
+          patients_treated?: number | null
+          qualification?: string | null
+          specialty?: string
+          success_rate?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specialists_hospital_id_fkey"
+            columns: ["hospital_id"]
+            isOneToOne: false
+            referencedRelation: "hospitals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
