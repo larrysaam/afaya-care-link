@@ -9,7 +9,9 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { specialties, accreditations } from "@/data/hospitals";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
+import { X, Building2, MapPin, Globe, Star, Users, Award } from "lucide-react";
+import { ImageUpload } from "./ImageUpload";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface HospitalFormProps {
   hospital?: any;
@@ -134,237 +136,324 @@ export function HospitalForm({ hospital, onSuccess }: HospitalFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Hospital Name *</Label>
-          <Input
-            id="name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="slug">URL Slug</Label>
-          <Input
-            id="slug"
-            value={formData.slug}
-            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-            placeholder="auto-generated-from-name"
-          />
-        </div>
-      </div>
+      {/* Image Uploads */}
+      <Card className="border-dashed">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <Building2 className="h-4 w-4 text-primary" />
+            Hospital Images
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <ImageUpload
+              label="Hospital Image"
+              value={formData.image_url}
+              onChange={(url) => setFormData({ ...formData, image_url: url })}
+              folder="hospitals/images"
+              aspectRatio="video"
+            />
+            <ImageUpload
+              label="Hospital Logo"
+              value={formData.logo_url}
+              onChange={(url) => setFormData({ ...formData, logo_url: url })}
+              folder="hospitals/logos"
+              aspectRatio="square"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="city">City *</Label>
-          <Input
-            id="city"
-            value={formData.city}
-            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="state">State *</Label>
-          <Input
-            id="state"
-            value={formData.state}
-            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="established">Established Year</Label>
-          <Input
-            id="established"
-            type="number"
-            value={formData.established}
-            onChange={(e) => setFormData({ ...formData, established: e.target.value })}
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="address">Full Address</Label>
-        <Input
-          id="address"
-          value={formData.address}
-          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone</Label>
-          <Input
-            id="phone"
-            value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="website">Website</Label>
-          <Input
-            id="website"
-            value={formData.website}
-            onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          rows={4}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="beds">Number of Beds</Label>
-          <Input
-            id="beds"
-            type="number"
-            value={formData.beds}
-            onChange={(e) => setFormData({ ...formData, beds: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="rating">Rating (0-5)</Label>
-          <Input
-            id="rating"
-            type="number"
-            step="0.1"
-            min="0"
-            max="5"
-            value={formData.rating}
-            onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="success_rate">Success Rate (%)</Label>
-          <Input
-            id="success_rate"
-            type="number"
-            step="0.1"
-            min="0"
-            max="100"
-            value={formData.success_rate}
-            onChange={(e) => setFormData({ ...formData, success_rate: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="international_patients">Int'l Patients/Year</Label>
-          <Input
-            id="international_patients"
-            type="number"
-            value={formData.international_patients}
-            onChange={(e) => setFormData({ ...formData, international_patients: parseInt(e.target.value) || 0 })}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="image_url">Hospital Image URL</Label>
-          <Input
-            id="image_url"
-            value={formData.image_url}
-            onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="logo_url">Logo URL</Label>
-          <Input
-            id="logo_url"
-            value={formData.logo_url}
-            onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>Specialties</Label>
-        <div className="flex flex-wrap gap-2 p-3 border rounded-md">
-          {specialties.map((spec) => (
-            <Badge
-              key={spec}
-              variant={formData.specialties.includes(spec) ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => toggleSpecialty(spec)}
-            >
-              {spec}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>Accreditations & Certifications</Label>
-        <div className="flex flex-wrap gap-2 p-3 border rounded-md">
-          {accreditations.map((accred) => (
-            <Badge
-              key={accred}
-              variant={formData.accreditations.includes(accred) ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => toggleAccreditation(accred)}
-            >
-              {accred}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label>Features & Services</Label>
-        <div className="flex gap-2">
-          <Input
-            value={newFeature}
-            onChange={(e) => setNewFeature(e.target.value)}
-            placeholder="Add a feature (e.g., 24/7 Emergency)"
-            onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addFeature())}
-          />
-          <Button type="button" variant="secondary" onClick={addFeature}>
-            Add
-          </Button>
-        </div>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {formData.features.map((feature: string) => (
-            <Badge key={feature} variant="secondary" className="gap-1">
-              {feature}
-              <X
-                className="h-3 w-3 cursor-pointer"
-                onClick={() => removeFeature(feature)}
+      {/* Basic Information */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <Building2 className="h-4 w-4 text-primary" />
+            Basic Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Hospital Name *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Enter hospital name"
+                required
               />
-            </Badge>
-          ))}
-        </div>
-      </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="slug">URL Slug</Label>
+              <Input
+                id="slug"
+                value={formData.slug}
+                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                placeholder="auto-generated-from-name"
+              />
+            </div>
+          </div>
 
-      <div className="flex items-center gap-3">
-        <Switch
-          id="is_active"
-          checked={formData.is_active}
-          onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-        />
-        <Label htmlFor="is_active">Hospital is Active</Label>
-      </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Brief description of the hospital..."
+              rows={3}
+              className="resize-none"
+            />
+          </div>
 
-      <div className="flex justify-end gap-3">
-        <Button type="submit" disabled={mutation.isPending}>
+          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+            <Switch
+              id="is_active"
+              checked={formData.is_active}
+              onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+            />
+            <Label htmlFor="is_active" className="cursor-pointer">Hospital is Active & Visible</Label>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Location */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-primary" />
+            Location & Contact
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="city">City *</Label>
+              <Input
+                id="city"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                placeholder="Mumbai"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="state">State *</Label>
+              <Input
+                id="state"
+                value={formData.state}
+                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                placeholder="Maharashtra"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="established">Established Year</Label>
+              <Input
+                id="established"
+                type="number"
+                value={formData.established}
+                onChange={(e) => setFormData({ ...formData, established: e.target.value })}
+                placeholder="1990"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="address">Full Address</Label>
+            <Input
+              id="address"
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              placeholder="Street address, landmark..."
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+91 22 1234 5678"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="contact@hospital.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                value={formData.website}
+                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                placeholder="https://hospital.com"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Statistics */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <Star className="h-4 w-4 text-primary" />
+            Statistics & Metrics
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="beds">Beds</Label>
+              <Input
+                id="beds"
+                type="number"
+                value={formData.beds}
+                onChange={(e) => setFormData({ ...formData, beds: e.target.value })}
+                placeholder="500"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="rating">Rating (0-5)</Label>
+              <Input
+                id="rating"
+                type="number"
+                step="0.1"
+                min="0"
+                max="5"
+                value={formData.rating}
+                onChange={(e) => setFormData({ ...formData, rating: e.target.value })}
+                placeholder="4.5"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="success_rate">Success Rate %</Label>
+              <Input
+                id="success_rate"
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                value={formData.success_rate}
+                onChange={(e) => setFormData({ ...formData, success_rate: e.target.value })}
+                placeholder="95"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="international_patients">Int'l Patients/Yr</Label>
+              <Input
+                id="international_patients"
+                type="number"
+                value={formData.international_patients}
+                onChange={(e) => setFormData({ ...formData, international_patients: parseInt(e.target.value) || 0 })}
+                placeholder="5000"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Specialties */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <Users className="h-4 w-4 text-primary" />
+            Medical Specialties
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {specialties.map((spec) => (
+              <Badge
+                key={spec}
+                variant={formData.specialties.includes(spec) ? "default" : "outline"}
+                className="cursor-pointer transition-colors hover:bg-primary/80"
+                onClick={() => toggleSpecialty(spec)}
+              >
+                {spec}
+              </Badge>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Accreditations */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <Award className="h-4 w-4 text-primary" />
+            Accreditations & Certifications
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {accreditations.map((accred) => (
+              <Badge
+                key={accred}
+                variant={formData.accreditations.includes(accred) ? "default" : "outline"}
+                className="cursor-pointer transition-colors hover:bg-primary/80"
+                onClick={() => toggleAccreditation(accred)}
+              >
+                {accred}
+              </Badge>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Features */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <Globe className="h-4 w-4 text-primary" />
+            Features & Services
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex gap-2">
+            <Input
+              value={newFeature}
+              onChange={(e) => setNewFeature(e.target.value)}
+              placeholder="Add a feature (e.g., 24/7 Emergency)"
+              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addFeature())}
+              className="flex-1"
+            />
+            <Button type="button" variant="secondary" onClick={addFeature}>
+              Add
+            </Button>
+          </div>
+          {formData.features.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {formData.features.map((feature: string) => (
+                <Badge key={feature} variant="secondary" className="gap-1 pr-1">
+                  {feature}
+                  <button
+                    type="button"
+                    onClick={() => removeFeature(feature)}
+                    className="ml-1 rounded-full hover:bg-destructive/20 p-0.5"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Submit */}
+      <div className="flex justify-end gap-3 pt-4 border-t">
+        <Button type="submit" disabled={mutation.isPending} size="lg">
           {mutation.isPending ? "Saving..." : isEditing ? "Update Hospital" : "Create Hospital"}
         </Button>
       </div>
