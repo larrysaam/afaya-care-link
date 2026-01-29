@@ -126,7 +126,7 @@ const MyConsultations = () => {
         }} className="mx-0 my-[50px]">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="font-bold text-foreground text-2xl">My Consultations</h1>
+                <h1 className="font-bold text-foreground text-xl">My Consultations</h1>
                 <p className="text-muted-foreground text-sm">Track and manage your consultation requests</p>
               </div>
               <Button variant="outline" onClick={fetchConsultations}>
