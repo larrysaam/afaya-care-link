@@ -221,8 +221,8 @@ const MyConsultations = () => {
                                   <Video className="h-4 w-4 mr-2" />
                                   Join Video Consultation
                                   <ExternalLink className="h-4 w-4 ml-2" />
-                                </a> : <span>
-                                  
+                                </a> : <span className="flex items-center">
+                                  <Video className="h-4 w-4 mr-2" />
                                   Join Video Consultation
                                 </span>}
                             </Button>
