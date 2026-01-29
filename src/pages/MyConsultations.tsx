@@ -123,7 +123,7 @@ const MyConsultations = () => {
           y: 0
         }} transition={{
           duration: 0.5
-        }} className="mx-0 my-[50px]">
+        }} className="mx-0 my-[80px]">
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="font-bold text-foreground text-xl">My Consultations</h1>
