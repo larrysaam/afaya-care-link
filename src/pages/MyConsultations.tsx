@@ -11,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-
 interface Consultation {
   id: string;
   hospital_id: string;
@@ -25,102 +24,110 @@ interface Consultation {
   created_at: string;
   updated_at: string;
 }
-
 const statusConfig = {
-  pending: { label: 'Pending Review', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' },
-  under_review: { label: 'Under Review', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
-  approved: { label: 'Approved', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
-  scheduled: { label: 'Scheduled', color: 'bg-primary/10 text-primary' },
-  completed: { label: 'Completed', color: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300' },
-  cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' },
+  pending: {
+    label: 'Pending Review',
+    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+  },
+  under_review: {
+    label: 'Under Review',
+    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+  },
+  approved: {
+    label: 'Approved',
+    color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+  },
+  scheduled: {
+    label: 'Scheduled',
+    color: 'bg-primary/10 text-primary'
+  },
+  completed: {
+    label: 'Completed',
+    color: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
+  },
+  cancelled: {
+    label: 'Cancelled',
+    color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+  }
 };
-
 const MyConsultations = () => {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
-  const { toast } = useToast();
+  const {
+    user,
+    loading
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
-
   useEffect(() => {
     if (user) {
       fetchConsultations();
-      
-      // Set up realtime subscription
-      const channel = supabase
-        .channel('consultations-changes')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'consultations',
-            filter: `patient_id=eq.${user.id}`,
-          },
-          () => {
-            fetchConsultations();
-          }
-        )
-        .subscribe();
 
+      // Set up realtime subscription
+      const channel = supabase.channel('consultations-changes').on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'consultations',
+        filter: `patient_id=eq.${user.id}`
+      }, () => {
+        fetchConsultations();
+      }).subscribe();
       return () => {
         supabase.removeChannel(channel);
       };
     }
   }, [user]);
-
   const fetchConsultations = async () => {
     if (!user) return;
-
     try {
-      const { data, error } = await supabase
-        .from('consultations')
-        .select('*')
-        .eq('patient_id', user.id)
-        .order('created_at', { ascending: false });
-
+      const {
+        data,
+        error
+      } = await supabase.from('consultations').select('*').eq('patient_id', user.id).order('created_at', {
+        ascending: false
+      });
       if (error) throw error;
       setConsultations(data || []);
     } catch (error: any) {
       toast({
         title: "Error fetching consultations",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   if (loading || isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
+  return <div className="min-h-screen flex flex-col bg-background">
       <Header />
       
       <main className="flex-1 py-8 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+        <div className="container max-w-4xl mx-0 pr-[50px] pl-[50px] my-[50px] px-0">
+          <motion.div initial={{
+          opacity: 0,
+          y: 20
+        }} animate={{
+          opacity: 1,
+          y: 0
+        }} transition={{
+          duration: 0.5
+        }} className="mx-0 my-[50px]">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">My Consultations</h1>
-                <p className="text-muted-foreground">Track and manage your consultation requests</p>
+                <h1 className="font-bold text-foreground text-2xl">My Consultations</h1>
+                <p className="text-muted-foreground text-sm">Track and manage your consultation requests</p>
               </div>
               <Button variant="outline" onClick={fetchConsultations}>
                 <RefreshCw className="h-4 w-4 mr-2" />
@@ -128,8 +135,7 @@ const MyConsultations = () => {
               </Button>
             </div>
 
-            {consultations.length === 0 ? (
-              <Card className="text-center py-12">
+            {consultations.length === 0 ? <Card className="text-center py-12">
                 <CardContent>
                   <Hospital className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
                   <h2 className="text-xl font-semibold mb-2">No Consultations Yet</h2>
@@ -140,11 +146,8 @@ const MyConsultations = () => {
                     <Button>Browse Hospitals</Button>
                   </Link>
                 </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {consultations.map((consultation) => (
-                  <Card key={consultation.id} className="overflow-hidden">
+              </Card> : <div className="space-y-4">
+                {consultations.map(consultation => <Card key={consultation.id} className="overflow-hidden">
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div>
@@ -169,23 +172,18 @@ const MyConsultations = () => {
                           Submitted: {format(new Date(consultation.created_at), 'PPP')}
                         </div>
                         
-                        {consultation.scheduled_date && (
-                          <div className="flex items-center gap-2 text-primary font-medium">
+                        {consultation.scheduled_date && <div className="flex items-center gap-2 text-primary font-medium">
                             <Clock className="h-4 w-4" />
                             Scheduled: {format(new Date(consultation.scheduled_date), 'PPP p')}
-                          </div>
-                        )}
+                          </div>}
                       </div>
 
-                      {consultation.admin_notes && (
-                        <div className="bg-muted/50 p-3 rounded-lg">
+                      {consultation.admin_notes && <div className="bg-muted/50 p-3 rounded-lg">
                           <p className="text-sm font-medium mb-1">Note from Admin:</p>
                           <p className="text-sm text-muted-foreground">{consultation.admin_notes}</p>
-                        </div>
-                      )}
+                        </div>}
 
-                      {consultation.status === 'scheduled' && consultation.meeting_link && (
-                        <div className="flex gap-3">
+                      {consultation.status === 'scheduled' && consultation.meeting_link && <div className="flex gap-3">
                           <Button asChild className="flex-1">
                             <a href={consultation.meeting_link} target="_blank" rel="noopener noreferrer">
                               <Video className="h-4 w-4 mr-2" />
@@ -193,8 +191,7 @@ const MyConsultations = () => {
                               <ExternalLink className="h-4 w-4 ml-2" />
                             </a>
                           </Button>
-                        </div>
-                      )}
+                        </div>}
 
                       <div className="flex justify-end pt-2 border-t">
                         <Button variant="ghost" size="sm" asChild>
@@ -205,17 +202,13 @@ const MyConsultations = () => {
                         </Button>
                       </div>
                     </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+                  </Card>)}
+              </div>}
           </motion.div>
         </div>
       </main>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default MyConsultations;
