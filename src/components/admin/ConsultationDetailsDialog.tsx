@@ -436,10 +436,15 @@ export const ConsultationDetailsDialog = ({
               </div>
 
               {newStatus === 'scheduled' && (
-                <>
+                <div className="space-y-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                  <h4 className="font-medium text-primary flex items-center gap-2">
+                    <Video className="h-4 w-4" />
+                    Schedule Video Consultation
+                  </h4>
+                  
                   <div className="space-y-2">
                     <Label>Consultation Date *</Label>
-                    <Popover>
+                    <Popover modal={true}>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
@@ -452,14 +457,14 @@ export const ConsultationDetailsDialog = ({
                           {scheduledDate ? format(scheduledDate, "PPP") : "Pick a date"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent className="w-auto p-0 z-[100]" align="start" side="bottom" sideOffset={4}>
                         <CalendarComponent
                           mode="single"
                           selected={scheduledDate}
                           onSelect={setScheduledDate}
                           disabled={(date) => date < new Date()}
                           initialFocus
-                          className={cn("p-3 pointer-events-auto")}
+                          className="p-3 pointer-events-auto"
                         />
                       </PopoverContent>
                     </Popover>
@@ -471,6 +476,7 @@ export const ConsultationDetailsDialog = ({
                       type="time"
                       value={scheduledTime}
                       onChange={(e) => setScheduledTime(e.target.value)}
+                      className="w-full"
                     />
                   </div>
 
@@ -482,10 +488,16 @@ export const ConsultationDetailsDialog = ({
                       onChange={(e) => setMeetingLink(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Provide a video conferencing link (Google Meet, Zoom, etc.)
+                      Provide a Google Meet, Zoom, or other video conferencing link
                     </p>
                   </div>
-                </>
+
+                  {(!scheduledDate || !meetingLink) && (
+                    <p className="text-xs text-destructive">
+                      * Date and meeting link are required to schedule the consultation
+                    </p>
+                  )}
+                </div>
               )}
 
               <div className="space-y-2">
