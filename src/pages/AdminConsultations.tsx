@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
-import { Calendar, Clock, User, FileText, Search, Filter, Check, X, CalendarIcon } from 'lucide-react';
+import { Calendar, Clock, User, FileText, Search, Filter, Eye } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/layout/AdminLayout';
@@ -11,13 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+import { ConsultationDetailsDialog } from '@/components/admin/ConsultationDetailsDialog';
 
 interface Consultation {
   id: string;
@@ -55,9 +50,9 @@ const statusConfig = {
 };
 
 const urgencyConfig = {
-  normal: { label: 'Normal', color: 'bg-gray-100 text-gray-800' },
-  urgent: { label: 'Urgent', color: 'bg-orange-100 text-orange-800' },
-  emergency: { label: 'Emergency', color: 'bg-red-100 text-red-800' },
+  normal: { label: 'Normal', color: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300' },
+  urgent: { label: 'Urgent', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400' },
+  emergency: { label: 'Emergency', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' },
 };
 
 const AdminConsultations = () => {
@@ -70,15 +65,7 @@ const AdminConsultations = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedConsultation, setSelectedConsultation] = useState<Consultation | null>(null);
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
-  
-  // Update form state
-  const [newStatus, setNewStatus] = useState<string>('');
-  const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
-  const [scheduledTime, setScheduledTime] = useState('10:00');
-  const [meetingLink, setMeetingLink] = useState('');
-  const [adminNotes, setAdminNotes] = useState('');
-  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -154,58 +141,9 @@ const AdminConsultations = () => {
     }
   };
 
-  const openUpdateDialog = (consultation: Consultation) => {
+  const openDetailsDialog = (consultation: Consultation) => {
     setSelectedConsultation(consultation);
-    setNewStatus(consultation.status);
-    setScheduledDate(consultation.scheduled_date ? new Date(consultation.scheduled_date) : undefined);
-    setScheduledTime(consultation.scheduled_date ? format(new Date(consultation.scheduled_date), 'HH:mm') : '10:00');
-    setMeetingLink(consultation.meeting_link || '');
-    setAdminNotes(consultation.admin_notes || '');
-    setIsUpdateDialogOpen(true);
-  };
-
-  const handleUpdateConsultation = async () => {
-    if (!selectedConsultation) return;
-
-    setIsUpdating(true);
-
-    try {
-      let scheduledDateTime = null;
-      if (newStatus === 'scheduled' && scheduledDate) {
-        const [hours, minutes] = scheduledTime.split(':');
-        const dateTime = new Date(scheduledDate);
-        dateTime.setHours(parseInt(hours), parseInt(minutes));
-        scheduledDateTime = dateTime.toISOString();
-      }
-
-      const { error } = await supabase
-        .from('consultations')
-        .update({
-          status: newStatus as 'pending' | 'under_review' | 'approved' | 'scheduled' | 'completed' | 'cancelled',
-          scheduled_date: scheduledDateTime,
-          meeting_link: newStatus === 'scheduled' ? meetingLink : null,
-          admin_notes: adminNotes || null,
-        })
-        .eq('id', selectedConsultation.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Consultation updated",
-        description: "The consultation status has been updated successfully.",
-      });
-
-      setIsUpdateDialogOpen(false);
-      fetchConsultations();
-    } catch (error: any) {
-      toast({
-        title: "Update failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsUpdating(false);
-    }
+    setIsDetailsDialogOpen(true);
   };
 
   const filteredConsultations = consultations.filter(consultation => {
@@ -242,27 +180,39 @@ const AdminConsultations = () => {
             transition={{ duration: 0.5 }}
           >
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-              <p className="text-muted-foreground">Manage consultation requests</p>
+              <h1 className="text-3xl font-bold text-foreground">Consultations</h1>
+              <p className="text-muted-foreground">Manage and schedule patient consultations</p>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{consultations.filter(c => c.status === 'pending').length}</div>
+                  <div className="text-2xl font-bold">{consultations.length}</div>
+                  <p className="text-sm text-muted-foreground">Total</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-2xl font-bold text-yellow-600">{consultations.filter(c => c.status === 'pending').length}</div>
                   <p className="text-sm text-muted-foreground">Pending</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{consultations.filter(c => c.status === 'under_review').length}</div>
+                  <div className="text-2xl font-bold text-blue-600">{consultations.filter(c => c.status === 'under_review').length}</div>
                   <p className="text-sm text-muted-foreground">Under Review</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{consultations.filter(c => c.status === 'scheduled').length}</div>
+                  <div className="text-2xl font-bold text-green-600">{consultations.filter(c => c.status === 'approved').length}</div>
+                  <p className="text-sm text-muted-foreground">Approved</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-2xl font-bold text-primary">{consultations.filter(c => c.status === 'scheduled').length}</div>
                   <p className="text-sm text-muted-foreground">Scheduled</p>
                 </CardContent>
               </Card>
@@ -315,7 +265,7 @@ const AdminConsultations = () => {
                 filteredConsultations.map((consultation) => {
                   const patient = profiles[consultation.patient_id];
                   return (
-                    <Card key={consultation.id}>
+                    <Card key={consultation.id} className="hover:shadow-md transition-shadow">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between flex-wrap gap-2">
                           <div>
@@ -324,7 +274,7 @@ const AdminConsultations = () => {
                               {patient?.full_name || 'Unknown Patient'}
                             </CardTitle>
                             <CardDescription>
-                              {patient?.email} • {patient?.country}
+                              {patient?.email} • {patient?.country || 'Unknown Country'}
                             </CardDescription>
                           </div>
                           <div className="flex gap-2">
@@ -338,12 +288,14 @@ const AdminConsultations = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div>
-                            <p className="text-sm font-medium">Specialty & Specialist</p>
-                            <p className="text-sm text-muted-foreground">
-                              {consultation.specialty} - {consultation.specialist_name}
-                            </p>
+                            <p className="text-sm font-medium">Specialty</p>
+                            <p className="text-sm text-muted-foreground">{consultation.specialty}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Specialist</p>
+                            <p className="text-sm text-muted-foreground">{consultation.specialist_name}</p>
                           </div>
                           <div>
                             <p className="text-sm font-medium">Preferred Date</p>
@@ -356,22 +308,15 @@ const AdminConsultations = () => {
                         </div>
 
                         <div>
-                          <p className="text-sm font-medium mb-1">Condition</p>
-                          <p className="text-sm text-muted-foreground">{consultation.condition_description}</p>
+                          <p className="text-sm font-medium mb-1">Condition Summary</p>
+                          <p className="text-sm text-muted-foreground line-clamp-2">{consultation.condition_description}</p>
                         </div>
 
-                        {consultation.medical_history && (
-                          <div>
-                            <p className="text-sm font-medium mb-1">Medical History</p>
-                            <p className="text-sm text-muted-foreground">{consultation.medical_history}</p>
-                          </div>
-                        )}
-
                         {consultation.scheduled_date && (
-                          <div className="bg-primary/5 p-3 rounded-lg flex items-center gap-3">
+                          <div className="bg-primary/5 p-3 rounded-lg flex items-center gap-3 border border-primary/20">
                             <Clock className="h-5 w-5 text-primary" />
                             <div>
-                              <p className="text-sm font-medium">Scheduled for</p>
+                              <p className="text-sm font-medium text-primary">Scheduled for</p>
                               <p className="text-sm text-muted-foreground">
                                 {format(new Date(consultation.scheduled_date), 'PPP p')}
                               </p>
@@ -383,108 +328,10 @@ const AdminConsultations = () => {
                           <p className="text-xs text-muted-foreground">
                             Submitted: {format(new Date(consultation.created_at), 'PPP')}
                           </p>
-                          <Dialog open={isUpdateDialogOpen && selectedConsultation?.id === consultation.id} onOpenChange={setIsUpdateDialogOpen}>
-                            <DialogTrigger asChild>
-                              <Button onClick={() => openUpdateDialog(consultation)}>
-                                Update Status
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[500px]">
-                              <DialogHeader>
-                                <DialogTitle>Update Consultation</DialogTitle>
-                                <DialogDescription>
-                                  Update the status and schedule for this consultation request.
-                                </DialogDescription>
-                              </DialogHeader>
-                              
-                              <div className="space-y-4 py-4">
-                                <div className="space-y-2">
-                                  <Label>Status</Label>
-                                  <Select value={newStatus} onValueChange={setNewStatus}>
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="pending">Pending</SelectItem>
-                                      <SelectItem value="under_review">Under Review</SelectItem>
-                                      <SelectItem value="approved">Approved</SelectItem>
-                                      <SelectItem value="scheduled">Scheduled</SelectItem>
-                                      <SelectItem value="completed">Completed</SelectItem>
-                                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-
-                                {newStatus === 'scheduled' && (
-                                  <>
-                                    <div className="space-y-2">
-                                      <Label>Consultation Date</Label>
-                                      <Popover>
-                                        <PopoverTrigger asChild>
-                                          <Button
-                                            variant="outline"
-                                            className={cn(
-                                              "w-full justify-start text-left font-normal",
-                                              !scheduledDate && "text-muted-foreground"
-                                            )}
-                                          >
-                                            <CalendarIcon className="mr-2 h-4 w-4" />
-                                            {scheduledDate ? format(scheduledDate, "PPP") : "Pick a date"}
-                                          </Button>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                          <CalendarComponent
-                                            mode="single"
-                                            selected={scheduledDate}
-                                            onSelect={setScheduledDate}
-                                            disabled={(date) => date < new Date()}
-                                            initialFocus
-                                            className={cn("p-3 pointer-events-auto")}
-                                          />
-                                        </PopoverContent>
-                                      </Popover>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                      <Label>Time</Label>
-                                      <Input
-                                        type="time"
-                                        value={scheduledTime}
-                                        onChange={(e) => setScheduledTime(e.target.value)}
-                                      />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                      <Label>Meeting Link</Label>
-                                      <Input
-                                        placeholder="https://meet.google.com/..."
-                                        value={meetingLink}
-                                        onChange={(e) => setMeetingLink(e.target.value)}
-                                      />
-                                    </div>
-                                  </>
-                                )}
-
-                                <div className="space-y-2">
-                                  <Label>Admin Notes</Label>
-                                  <Textarea
-                                    placeholder="Add notes for the patient..."
-                                    value={adminNotes}
-                                    onChange={(e) => setAdminNotes(e.target.value)}
-                                  />
-                                </div>
-                              </div>
-
-                              <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsUpdateDialogOpen(false)}>
-                                  Cancel
-                                </Button>
-                                <Button onClick={handleUpdateConsultation} disabled={isUpdating}>
-                                  {isUpdating ? 'Updating...' : 'Update Consultation'}
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
+                          <Button onClick={() => openDetailsDialog(consultation)}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Details
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -495,6 +342,17 @@ const AdminConsultations = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Consultation Details Dialog */}
+      {selectedConsultation && (
+        <ConsultationDetailsDialog
+          consultation={selectedConsultation}
+          patient={profiles[selectedConsultation.patient_id]}
+          isOpen={isDetailsDialogOpen}
+          onClose={() => setIsDetailsDialogOpen(false)}
+          onUpdate={fetchConsultations}
+        />
+      )}
     </AdminLayout>
   );
 };
