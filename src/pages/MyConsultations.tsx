@@ -217,13 +217,18 @@ const MyConsultations = () => {
                           </div>
                           <div className="flex gap-3">
                             <Button className="flex-1" disabled={!canJoinCall(consultation.scheduled_date)} asChild={canJoinCall(consultation.scheduled_date)}>
-                              {canJoinCall(consultation.scheduled_date) ? <a href={consultation.meeting_link} target="_blank" rel="noopener noreferrer">
+                              {canJoinCall(consultation.scheduled_date) ? (
+                                <a href={consultation.meeting_link} target="_blank" rel="noopener noreferrer">
                                   <Video className="h-4 w-4 mr-2" />
                                   Join Video Consultation
                                   <ExternalLink className="h-4 w-4 ml-2" />
-                                </a> : <span>Join Video Consultation<Video className="h-4 w-4 mr-2" />
+                                </a>
+                              ) : (
+                                <span>
+                                  <Video className="h-4 w-4 mr-2" />
                                   Join Video Consultation
-                                </span>}
+                                </span>
+                              )}
                             </Button>
                           </div>
                         </div>}
