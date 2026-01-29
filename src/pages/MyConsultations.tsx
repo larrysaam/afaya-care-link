@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { format } from 'date-fns';
+import { format, isWithinInterval, addMinutes, subMinutes } from 'date-fns';
 import { Calendar, Clock, Hospital, FileText, Video, ExternalLink, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +11,37 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+
+// Helper function to check if user can join the video call
+const canJoinCall = (scheduledDate: string | null) => {
+  if (!scheduledDate) return false;
+  
+  const scheduledTime = new Date(scheduledDate);
+  const now = new Date();
+  
+  // Allow joining 15 minutes before and up to 2 hours after scheduled time
+  return isWithinInterval(now, {
+    start: subMinutes(scheduledTime, 15),
+    end: addMinutes(scheduledTime, 120)
+  });
+};
+
+// Helper function to get call status message
+const getCallStatusMessage = (scheduledDate: string | null) => {
+  if (!scheduledDate) return null;
+  
+  const scheduledTime = new Date(scheduledDate);
+  const now = new Date();
+  const joinWindow = subMinutes(scheduledTime, 15);
+  
+  if (now < joinWindow) {
+    return `Join available from ${format(joinWindow, 'p')}`;
+  } else if (canJoinCall(scheduledDate)) {
+    return 'Ready to join';
+  } else {
+    return 'Session ended';
+  }
+};
 interface Consultation {
   id: string;
   hospital_id: string;
@@ -183,15 +214,37 @@ const MyConsultations = () => {
                           <p className="text-sm text-muted-foreground">{consultation.admin_notes}</p>
                         </div>}
 
-                      {consultation.status === 'scheduled' && consultation.meeting_link && <div className="flex gap-3">
-                          <Button asChild className="flex-1">
-                            <a href={consultation.meeting_link} target="_blank" rel="noopener noreferrer">
-                              <Video className="h-4 w-4 mr-2" />
-                              Join Video Consultation
-                              <ExternalLink className="h-4 w-4 ml-2" />
-                            </a>
-                          </Button>
-                        </div>}
+                      {consultation.status === 'scheduled' && consultation.meeting_link && (
+                        <div className="space-y-2">
+                          <div className={`text-xs px-2 py-1 rounded inline-block ${
+                            canJoinCall(consultation.scheduled_date)
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                              : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                          }`}>
+                            {getCallStatusMessage(consultation.scheduled_date)}
+                          </div>
+                          <div className="flex gap-3">
+                            <Button 
+                              className="flex-1"
+                              disabled={!canJoinCall(consultation.scheduled_date)}
+                              asChild={canJoinCall(consultation.scheduled_date)}
+                            >
+                              {canJoinCall(consultation.scheduled_date) ? (
+                                <a href={consultation.meeting_link} target="_blank" rel="noopener noreferrer">
+                                  <Video className="h-4 w-4 mr-2" />
+                                  Join Video Consultation
+                                  <ExternalLink className="h-4 w-4 ml-2" />
+                                </a>
+                              ) : (
+                                <span>
+                                  <Video className="h-4 w-4 mr-2" />
+                                  Join Video Consultation
+                                </span>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="flex justify-end pt-2 border-t">
                         <Button variant="ghost" size="sm" asChild>
