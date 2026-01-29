@@ -10,6 +10,7 @@ import HospitalProfile from "./pages/HospitalProfile";
 import Auth from "./pages/Auth";
 import ConsultationRequest from "./pages/ConsultationRequest";
 import MyConsultations from "./pages/MyConsultations";
+import ConsultationDetails from "./pages/ConsultationDetails";
 import AdminConsultations from "./pages/AdminConsultations";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/consultation/:hospitalId" element={<ConsultationRequest />} />
             <Route path="/my-consultations" element={<MyConsultations />} />
+            <Route path="/consultation-details/:id" element={<ConsultationDetails />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/consultations" element={<AdminConsultations />} />
             <Route path="/admin/users" element={<AdminUsers />} />
