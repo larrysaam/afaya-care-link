@@ -6,9 +6,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon, Upload, FileText, X, AlertCircle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { getHospitalById, Hospital } from '@/data/hospitals';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,16 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+
+interface Hospital {
+  id: string;
+  dbId: string;
+  name: string;
+  city: string;
+  state: string;
+  logo: string;
+  specialties: string[];
+}
 
 const consultationSchema = z.object({
   fullName: z.string().trim().min(2, "Name is required").max(100),
@@ -41,31 +51,25 @@ const consultationSchema = z.object({
 
 type ConsultationFormData = z.infer<typeof consultationSchema>;
 
-// Mock specialists data - in production, this would come from the database
-const getSpecialistsForHospital = (hospitalId: string, specialty: string) => {
-  const specialists: Record<string, { name: string; specialty: string; experience: string }[]> = {
-    "medanta-gurugram": [
-      { name: "Dr. Naresh Trehan", specialty: "Cardiology", experience: "40+ years" },
-      { name: "Dr. Arvind Kumar", specialty: "Oncology", experience: "25+ years" },
-      { name: "Dr. Rajesh Ahlawat", specialty: "Urology", experience: "30+ years" },
-      { name: "Dr. Rana Patir", specialty: "Neurology", experience: "28+ years" },
-      { name: "Dr. Ashok Rajgopal", specialty: "Orthopedics", experience: "35+ years" },
-    ],
-    "apollo-chennai": [
-      { name: "Dr. K. Hari Prasad", specialty: "Cardiology", experience: "30+ years" },
-      { name: "Dr. Prathap C Reddy", specialty: "Oncology", experience: "35+ years" },
-      { name: "Dr. Venkatesh Munikrishnan", specialty: "Transplant Surgery", experience: "20+ years" },
-    ],
-    "fortis-delhi": [
-      { name: "Dr. Ashok Seth", specialty: "Cardiology", experience: "35+ years" },
-      { name: "Dr. Simmardeep Gill", specialty: "Oncology", experience: "22+ years" },
-    ],
-  };
+// Fetch specialists from database
+const fetchSpecialists = async (hospitalDbId: string, specialty: string) => {
+  const { data, error } = await supabase
+    .from("specialists")
+    .select("id, name, specialty, experience_years")
+    .eq("hospital_id", hospitalDbId)
+    .eq("specialty", specialty)
+    .eq("is_active", true);
 
-  const hospitalSpecialists = specialists[hospitalId] || [];
-  return specialty 
-    ? hospitalSpecialists.filter(s => s.specialty === specialty)
-    : hospitalSpecialists;
+  if (error) {
+    console.error("Error fetching specialists:", error);
+    return [];
+  }
+
+  return (data || []).map(s => ({
+    name: s.name,
+    specialty: s.specialty,
+    experience: s.experience_years ? `${s.experience_years}+ years` : "Experienced",
+  }));
 };
 
 const ConsultationRequest = () => {
@@ -108,24 +112,51 @@ const ConsultationRequest = () => {
     }
   }, [user, loading, navigate, hospitalId, toast]);
 
-  useEffect(() => {
-    if (hospitalId) {
-      const hospitalData = getHospitalById(hospitalId);
-      if (hospitalData) {
-        setHospital(hospitalData);
-      } else {
-        navigate('/hospitals');
-      }
-    }
-  }, [hospitalId, navigate]);
+  // Fetch hospital from database
+  const { data: hospitalData, isLoading: hospitalLoading } = useQuery({
+    queryKey: ["hospital", hospitalId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("hospitals")
+        .select("id, slug, name, city, state, logo_url, specialties")
+        .eq("slug", hospitalId)
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) return null;
+
+      return {
+        id: data.slug,
+        dbId: data.id,
+        name: data.name,
+        city: data.city,
+        state: data.state,
+        logo: data.logo_url || "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=100&h=100&fit=crop",
+        specialties: data.specialties || [],
+      };
+    },
+    enabled: !!hospitalId,
+  });
 
   useEffect(() => {
-    if (hospitalId && selectedSpecialty) {
-      const specialistsList = getSpecialistsForHospital(hospitalId, selectedSpecialty);
-      setSpecialists(specialistsList);
-      form.setValue('specialist', '');
+    if (!hospitalLoading && hospitalData) {
+      setHospital(hospitalData);
+    } else if (!hospitalLoading && !hospitalData && hospitalId) {
+      navigate('/hospitals');
     }
-  }, [hospitalId, selectedSpecialty, form]);
+  }, [hospitalData, hospitalLoading, hospitalId, navigate]);
+
+  useEffect(() => {
+    const loadSpecialists = async () => {
+      if (hospital?.dbId && selectedSpecialty) {
+        const specialistsList = await fetchSpecialists(hospital.dbId, selectedSpecialty);
+        setSpecialists(specialistsList);
+        form.setValue('specialist', '');
+      }
+    };
+    loadSpecialists();
+  }, [hospital?.dbId, selectedSpecialty, form]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -230,9 +261,9 @@ const ConsultationRequest = () => {
     }
   };
 
-  if (loading || !hospital) {
+  if (loading || hospitalLoading || !hospital) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
