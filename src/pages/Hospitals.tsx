@@ -1,11 +1,41 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Building2, TrendingUp } from "lucide-react";
+import { Building2, TrendingUp, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HospitalFilters } from "@/components/hospitals/HospitalFilters";
 import { HospitalCard } from "@/components/hospitals/HospitalCard";
-import { filterHospitals, hospitals } from "@/data/hospitals";
+import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
+
+type DbHospital = Tables<"hospitals">;
+
+// Transform database hospital to the format expected by HospitalCard
+const transformHospital = (dbHospital: DbHospital) => ({
+  id: dbHospital.slug,
+  name: dbHospital.name,
+  city: dbHospital.city,
+  state: dbHospital.state,
+  rating: dbHospital.rating || 0,
+  reviewCount: dbHospital.review_count || 0,
+  specialties: dbHospital.specialties || [],
+  accreditations: dbHospital.accreditations || [],
+  description: dbHospital.description || "",
+  established: dbHospital.established || 0,
+  beds: dbHospital.beds || 0,
+  doctors: dbHospital.doctors_count || 0,
+  image: dbHospital.image_url || "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=800&h=500&fit=crop",
+  logo: dbHospital.logo_url || "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=100&h=100&fit=crop",
+  address: dbHospital.address || "",
+  phone: dbHospital.phone || "",
+  email: dbHospital.email || "",
+  website: dbHospital.website || "",
+  features: dbHospital.features || [],
+  internationalPatients: dbHospital.international_patients || 0,
+  successRate: dbHospital.success_rate || 0,
+  avgCostSavings: dbHospital.avg_cost_savings || 0,
+});
 
 const Hospitals = () => {
   const [filters, setFilters] = useState({
@@ -16,15 +46,49 @@ const Hospitals = () => {
     accreditation: "",
   });
 
+  // Fetch hospitals from database
+  const { data: dbHospitals = [], isLoading } = useQuery({
+    queryKey: ["hospitals"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("hospitals")
+        .select("*")
+        .eq("is_active", true)
+        .order("name");
+      
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Transform and filter hospitals
+  const hospitals = useMemo(() => dbHospitals.map(transformHospital), [dbHospitals]);
+
   const filteredHospitals = useMemo(() => {
-    return filterHospitals({
-      specialty: filters.specialty && filters.specialty !== "all" ? filters.specialty : undefined,
-      city: filters.city && filters.city !== "all" ? filters.city : undefined,
-      minRating: filters.minRating && filters.minRating !== "all" ? parseFloat(filters.minRating) : undefined,
-      accreditation: filters.accreditation && filters.accreditation !== "all" ? filters.accreditation : undefined,
-      search: filters.search || undefined,
+    return hospitals.filter((hospital) => {
+      if (filters.specialty && filters.specialty !== "all" && !hospital.specialties.includes(filters.specialty)) {
+        return false;
+      }
+      if (filters.city && filters.city !== "all" && hospital.city !== filters.city) {
+        return false;
+      }
+      if (filters.minRating && filters.minRating !== "all" && hospital.rating < parseFloat(filters.minRating)) {
+        return false;
+      }
+      if (filters.accreditation && filters.accreditation !== "all" && !hospital.accreditations.includes(filters.accreditation)) {
+        return false;
+      }
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        return (
+          hospital.name.toLowerCase().includes(searchLower) ||
+          hospital.city.toLowerCase().includes(searchLower) ||
+          hospital.specialties.some((s) => s.toLowerCase().includes(searchLower))
+        );
+      }
+      return true;
     });
-  }, [filters]);
+  }, [hospitals, filters]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -93,7 +157,11 @@ const Hospitals = () => {
               </p>
             </div>
 
-            {filteredHospitals.length > 0 ? (
+            {isLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            ) : filteredHospitals.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredHospitals.map((hospital, index) => (
                   <HospitalCard key={hospital.id} hospital={hospital} index={index} />
@@ -110,7 +178,9 @@ const Hospitals = () => {
                   No hospitals found
                 </h3>
                 <p className="text-muted-foreground max-w-md mx-auto">
-                  Try adjusting your filters or search terms to find more hospitals.
+                  {hospitals.length === 0 
+                    ? "No hospitals have been added to the database yet."
+                    : "Try adjusting your filters or search terms to find more hospitals."}
                 </p>
               </motion.div>
             )}
