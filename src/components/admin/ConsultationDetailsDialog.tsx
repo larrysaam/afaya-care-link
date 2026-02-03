@@ -144,6 +144,34 @@ export const ConsultationDetailsDialog = ({
     }
   };
 
+  const sendNotificationEmail = async (scheduledDateTime: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('send-consultation-notification', {
+        body: {
+          patientEmail: patient?.email,
+          patientName: patient?.full_name,
+          specialistName: consultation.specialist_name,
+          specialty: consultation.specialty,
+          scheduledDate: scheduledDateTime,
+          meetingLink: meetingLink,
+        },
+      });
+
+      if (error) {
+        console.error('Error sending notification email:', error);
+        toast({
+          title: "Email notification failed",
+          description: "Consultation was scheduled but email notification could not be sent.",
+          variant: "destructive",
+        });
+      } else {
+        console.log('Notification email sent successfully:', data);
+      }
+    } catch (error: any) {
+      console.error('Error invoking email function:', error);
+    }
+  };
+
   const handleUpdateConsultation = async () => {
     setIsUpdating(true);
 
@@ -168,9 +196,16 @@ export const ConsultationDetailsDialog = ({
 
       if (error) throw error;
 
+      // Send email notification when consultation is scheduled
+      if (newStatus === 'scheduled' && scheduledDateTime && meetingLink && patient?.email) {
+        await sendNotificationEmail(scheduledDateTime);
+      }
+
       toast({
         title: "Consultation updated",
-        description: "The consultation has been updated successfully.",
+        description: newStatus === 'scheduled' 
+          ? "The consultation has been scheduled and the patient has been notified via email."
+          : "The consultation has been updated successfully.",
       });
 
       onUpdate();
