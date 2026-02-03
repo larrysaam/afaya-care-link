@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Phone, Mail } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export const CTASection = () => {
@@ -42,18 +43,22 @@ export const CTASection = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Button 
+                asChild
                 size="xl" 
                 className="bg-charcoal text-primary-foreground hover:bg-charcoal/90 shadow-lg group"
               >
-                Create Free Account
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <Link to="/auth">
+                  Create Free Account
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
               </Button>
               <Button 
+                asChild
                 variant="outline" 
                 size="xl"
                 className="border-2 border-charcoal/30 text-charcoal hover:bg-charcoal/10"
               >
-                Contact Our Team
+                <a href="mailto:care@afayaconekt.com">Contact Our Team</a>
               </Button>
             </div>
 

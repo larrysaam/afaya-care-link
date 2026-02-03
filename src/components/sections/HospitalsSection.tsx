@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { MapPin, Star, Award, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const hospitals = [
@@ -131,9 +132,11 @@ export const HospitalsSection = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="text-center mt-12"
         >
-          <Button variant="outline" size="lg" className="group">
-            View All Hospitals
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <Button asChild variant="outline" size="lg" className="group">
+            <Link to="/hospitals">
+              View All Hospitals
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </Button>
         </motion.div>
       </div>

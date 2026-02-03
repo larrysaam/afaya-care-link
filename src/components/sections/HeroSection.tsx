@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Shield, Globe, Stethoscope } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-bg.jpg";
 const stats = [{
@@ -80,12 +81,14 @@ export const HeroSection = () => {
           duration: 0.6,
           delay: 0.3
         }} className="flex flex-col sm:flex-row gap-4 mb-12">
-            <Button variant="warm" size="xl" className="group">
-              Find a Hospital
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <Button asChild variant="warm" size="xl" className="group">
+              <Link to="/hospitals">
+                Find a Hospital
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
-            <Button variant="heroOutline" size="xl">
-              How It Works
+            <Button asChild variant="heroOutline" size="xl">
+              <a href="#how-it-works">How It Works</a>
             </Button>
           </motion.div>
 
