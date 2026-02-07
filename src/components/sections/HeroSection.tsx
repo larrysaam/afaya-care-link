@@ -120,6 +120,7 @@ export const HeroSection = () => {
           duration: 0.7,
           delay: 0.5
         }}
+        
       className="absolute bottom-0 left-0 right-0 bg-primary/95 backdrop-blur-sm mt-40">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-3 gap-8">
