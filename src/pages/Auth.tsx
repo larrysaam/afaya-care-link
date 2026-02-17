@@ -10,10 +10,12 @@ import { Footer } from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Heart, Mail, Lock, User } from 'lucide-react';
+import { Mail, Lock, User, Phone, Globe } from 'lucide-react';
+import platformLogo from '@/assets/platform-logo.png';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }),
@@ -23,6 +25,8 @@ const loginSchema = z.object({
 const signupSchema = z.object({
   fullName: z.string().trim().min(2, { message: "Name must be at least 2 characters" }).max(100),
   email: z.string().trim().email({ message: "Invalid email address" }).max(255),
+  phone: z.string().trim().min(7, { message: "Enter a valid phone number" }).max(20),
+  country: z.string().min(1, { message: "Please select your country" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters" }).max(72),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -32,6 +36,16 @@ const signupSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 type SignupFormData = z.infer<typeof signupSchema>;
+
+const africanCountries = [
+  "Nigeria", "Kenya", "Ghana", "Ethiopia", "Tanzania", "Uganda", "South Africa",
+  "Cameroon", "Senegal", "Rwanda", "Mozambique", "Zambia", "Zimbabwe", "Angola",
+  "Sudan", "Somalia", "Mali", "Niger", "Burkina Faso", "Ivory Coast",
+  "Madagascar", "Malawi", "Congo (DRC)", "Chad", "Guinea", "Benin", "Togo",
+  "Sierra Leone", "Liberia", "Mauritania", "Eritrea", "Gambia", "Botswana",
+  "Namibia", "Gabon", "Lesotho", "Equatorial Guinea", "Mauritius", "Eswatini",
+  "Djibouti", "Comoros", "Cape Verde", "Seychelles", "Other",
+];
 
 const Auth = () => {
   const [activeTab, setActiveTab] = useState('login');
@@ -53,7 +67,7 @@ const Auth = () => {
 
   const signupForm = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { fullName: '', email: '', password: '', confirmPassword: '' },
+    defaultValues: { fullName: '', email: '', phone: '', country: '', password: '', confirmPassword: '' },
   });
 
   const handleLogin = async (data: LoginFormData) => {
@@ -80,7 +94,7 @@ const Auth = () => {
 
   const handleSignup = async (data: SignupFormData) => {
     setIsLoading(true);
-    const { error } = await signUp(data.email, data.password, data.fullName);
+    const { error } = await signUp(data.email, data.password, data.fullName, data.phone, data.country);
     setIsLoading(false);
 
     if (error) {
@@ -115,7 +129,7 @@ const Auth = () => {
         >
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 mb-4">
-              <Heart className="h-8 w-8 text-primary" />
+              <img src={platformLogo} alt="AfayaConekt Logo" className="h-10 w-10 rounded-xl object-cover" />
               <span className="text-2xl font-bold text-primary">AfayaConekt</span>
             </div>
             <h1 className="text-2xl font-bold text-foreground">Welcome</h1>
@@ -124,12 +138,12 @@ const Auth = () => {
 
           <Card className="border-border/50 shadow-lg">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <CardHeader className="pb-4">
+              <div className="pb-4 pt-6 px-6">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="login">Login</TabsTrigger>
                   <TabsTrigger value="signup">Sign Up</TabsTrigger>
                 </TabsList>
-              </CardHeader>
+              </div>
 
               <CardContent>
                 <TabsContent value="login" className="mt-0">
@@ -138,34 +152,18 @@ const Auth = () => {
                       <Label htmlFor="login-email">Email</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="login-email"
-                          type="email"
-                          placeholder="you@example.com"
-                          className="pl-10"
-                          {...loginForm.register('email')}
-                        />
+                        <Input id="login-email" type="email" placeholder="you@example.com" className="pl-10" {...loginForm.register('email')} />
                       </div>
-                      {loginForm.formState.errors.email && (
-                        <p className="text-sm text-destructive">{loginForm.formState.errors.email.message}</p>
-                      )}
+                      {loginForm.formState.errors.email && <p className="text-sm text-destructive">{loginForm.formState.errors.email.message}</p>}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="login-password">Password</Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="login-password"
-                          type="password"
-                          placeholder="••••••••"
-                          className="pl-10"
-                          {...loginForm.register('password')}
-                        />
+                        <Input id="login-password" type="password" placeholder="••••••••" className="pl-10" {...loginForm.register('password')} />
                       </div>
-                      {loginForm.formState.errors.password && (
-                        <p className="text-sm text-destructive">{loginForm.formState.errors.password.message}</p>
-                      )}
+                      {loginForm.formState.errors.password && <p className="text-sm text-destructive">{loginForm.formState.errors.password.message}</p>}
                     </div>
 
                     <Button type="submit" className="w-full" disabled={isLoading}>
@@ -180,68 +178,61 @@ const Auth = () => {
                       <Label htmlFor="signup-name">Full Name</Label>
                       <div className="relative">
                         <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="signup-name"
-                          type="text"
-                          placeholder="John Doe"
-                          className="pl-10"
-                          {...signupForm.register('fullName')}
-                        />
+                        <Input id="signup-name" type="text" placeholder="John Doe" className="pl-10" {...signupForm.register('fullName')} />
                       </div>
-                      {signupForm.formState.errors.fullName && (
-                        <p className="text-sm text-destructive">{signupForm.formState.errors.fullName.message}</p>
-                      )}
+                      {signupForm.formState.errors.fullName && <p className="text-sm text-destructive">{signupForm.formState.errors.fullName.message}</p>}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="signup-email">Email</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="signup-email"
-                          type="email"
-                          placeholder="you@example.com"
-                          className="pl-10"
-                          {...signupForm.register('email')}
-                        />
+                        <Input id="signup-email" type="email" placeholder="you@example.com" className="pl-10" {...signupForm.register('email')} />
                       </div>
-                      {signupForm.formState.errors.email && (
-                        <p className="text-sm text-destructive">{signupForm.formState.errors.email.message}</p>
-                      )}
+                      {signupForm.formState.errors.email && <p className="text-sm text-destructive">{signupForm.formState.errors.email.message}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-phone">Phone Number</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input id="signup-phone" type="tel" placeholder="+234 800 000 0000" className="pl-10" {...signupForm.register('phone')} />
+                      </div>
+                      {signupForm.formState.errors.phone && <p className="text-sm text-destructive">{signupForm.formState.errors.phone.message}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-country">Country</Label>
+                      <Select onValueChange={(val) => signupForm.setValue('country', val, { shouldValidate: true })}>
+                        <SelectTrigger>
+                          <Globe className="h-4 w-4 text-muted-foreground mr-2" />
+                          <SelectValue placeholder="Select your country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {africanCountries.map((c) => (
+                            <SelectItem key={c} value={c}>{c}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {signupForm.formState.errors.country && <p className="text-sm text-destructive">{signupForm.formState.errors.country.message}</p>}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="signup-password">Password</Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="signup-password"
-                          type="password"
-                          placeholder="••••••••"
-                          className="pl-10"
-                          {...signupForm.register('password')}
-                        />
+                        <Input id="signup-password" type="password" placeholder="••••••••" className="pl-10" {...signupForm.register('password')} />
                       </div>
-                      {signupForm.formState.errors.password && (
-                        <p className="text-sm text-destructive">{signupForm.formState.errors.password.message}</p>
-                      )}
+                      {signupForm.formState.errors.password && <p className="text-sm text-destructive">{signupForm.formState.errors.password.message}</p>}
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="signup-confirm">Confirm Password</Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="signup-confirm"
-                          type="password"
-                          placeholder="••••••••"
-                          className="pl-10"
-                          {...signupForm.register('confirmPassword')}
-                        />
+                        <Input id="signup-confirm" type="password" placeholder="••••••••" className="pl-10" {...signupForm.register('confirmPassword')} />
                       </div>
-                      {signupForm.formState.errors.confirmPassword && (
-                        <p className="text-sm text-destructive">{signupForm.formState.errors.confirmPassword.message}</p>
-                      )}
+                      {signupForm.formState.errors.confirmPassword && <p className="text-sm text-destructive">{signupForm.formState.errors.confirmPassword.message}</p>}
                     </div>
 
                     <Button type="submit" className="w-full" disabled={isLoading}>

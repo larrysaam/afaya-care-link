@@ -1,5 +1,5 @@
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
-import platformLogo from "@/assets/platform-logo.jpg";
+import platformLogo from "@/assets/platform-logo.png";
 
 const footerLinks = {
   patients: {

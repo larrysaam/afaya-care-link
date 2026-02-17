@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, User, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import platformLogo from "@/assets/platform-logo.jpg";
+import platformLogo from "@/assets/platform-logo.png";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -78,6 +78,11 @@ export const Header = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      My Profile
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/my-consultations" className="cursor-pointer">
                       My Consultations
@@ -161,6 +166,11 @@ export const Header = () => {
               <div className="flex flex-col gap-2 pt-4 border-t border-border mt-2">
                 {user ? (
                   <>
+                    <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        My Profile
+                      </Button>
+                    </Link>
                     <Link to="/my-consultations" onClick={() => setIsMenuOpen(false)}>
                       <Button variant="ghost" className="w-full justify-start">
                         My Consultations
