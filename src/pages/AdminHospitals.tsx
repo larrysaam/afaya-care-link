@@ -54,6 +54,22 @@ export default function AdminHospitals() {
     },
   });
 
+  // Fetch actual specialist counts per hospital
+  const { data: specialistCounts } = useQuery({
+    queryKey: ["specialist-counts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("specialists")
+        .select("hospital_id");
+      if (error) throw error;
+      const counts: Record<string, number> = {};
+      data?.forEach((s) => {
+        counts[s.hospital_id] = (counts[s.hospital_id] || 0) + 1;
+      });
+      return counts;
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("hospitals").delete().eq("id", id);
@@ -251,7 +267,7 @@ export default function AdminHospitals() {
                     onClick={() => navigate(`/admin/hospitals/${hospital.id}/specialists`)}
                   >
                     <Users className="h-4 w-4 mr-2" />
-                    Manage Specialists ({hospital.doctors_count || 0})
+                    Manage Specialists ({specialistCounts?.[hospital.id] || 0})
                   </Button>
                 </CardContent>
               </Card>

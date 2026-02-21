@@ -1,4 +1,5 @@
-import { Heart, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import platformLogo from "@/assets/platform-logo.png";
 
 const footerLinks = {
   patients: {
@@ -57,9 +58,7 @@ export const Footer = () => {
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-6 lg:mb-0">
             <a href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-warm flex items-center justify-center">
-                <Heart className="w-5 h-5 text-primary-foreground" fill="currentColor" />
-              </div>
+              <img src={platformLogo} alt="AfayaConekt Logo" className="w-10 h-10 rounded-xl object-cover" />
               <span className="font-display font-bold text-xl">
                 Afaya<span className="text-secondary">Conekt</span>
               </span>
