@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, User, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import platformLogo from "@/assets/platform-logo.png";
+import platformLogo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -17,7 +17,6 @@ const navLinks = [
   { label: "How It Works", href: "/#how-it-works" },
   { label: "Services", href: "/#services" },
   { label: "Find Hospitals", href: "/hospitals" },
-  { label: "For Providers", href: "/#providers" },
 ];
 
 export const Header = () => {

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afaya CareLink - Supabase Setup Guide</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .step {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            border-radius: 8px;
+        }
+        .step h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        .step h3 {
+            color: #764ba2;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+        }
+        .step ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .step li {
+            margin-bottom: 10px;
+        }
+        .code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        .code.inline {
+            display: inline;
+            padding: 3px 8px;
+            font-size: 0.9em;
+        }
+        .link {
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        .link:hover {
+            text-decoration: underline;
+        }
+        .success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+        }
+        .checklist li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+            .step { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Afaya CareLink</h1>
+            <p>Supabase Migration Setup Guide</p>
+        </div>
+
+        <div class="content">
+            <div class="step success">
+                <h2>✅ What's Already Done</h2>
+                <ul>
+                    <li>Project ID configured: <code class="code inline">yfzpcyppnobbqbpsedtm</code></li>
+                    <li>Supabase URL set up</li>
+                    <li>All migration scripts created</li>
+                    <li>Database schema ready</li>
+                    <li>Password reset functionality implemented</li>
+                </ul>
+            </div>
+
+            <div class="step warning">
+                <h2>⚠️ What You Need To Do</h2>
+                <p><strong>Only 1 critical step remaining:</strong> Get your API key and update the .env file!</p>
+            </div>
+
+            <div class="step">
+                <h2><span class="badge">Step 1</span> Get Your API Key (2 minutes)</h2>
+                <ol>
+                    <li>Click this link to open your Supabase Dashboard:<br>
+                        <a href="https://supabase.com/dashboard/project/yfzpcyppnobbqbpsedtm/settings/api" target="_blank" class="link">
+                            https://supabase.com/dashboard/project/yfzpcyppnobbqbpsedtm/settings/api
+                        </a>
+                    </li>
+                    <li>Find the section labeled <strong>"Project API keys"</strong></li>
+                    <li>Look for the key labeled <strong>"anon" "public"</strong></li>
+                    <li>Click the <strong>Copy</strong> button (it starts with <code class="code inline">eyJ...</code>)</li>
+                </ol>
+                <p style="margin-top: 15px;"><strong>⚠️ Important:</strong> Copy the <strong>anon/public</strong> key, NOT the service_role key!</p>
+            </div>
+
+            <div class="step">
+                <h2><span class="badge">Step 2</span> Update .env File (1 minute)</h2>
+                <ol>
+                    <li>Open your project in VS Code</li>
+                    <li>Find and open the <code class="code inline">.env</code> file in the root folder</li>
+                    <li>Replace <code class="code inline">PASTE_YOUR_ANON_PUBLIC_KEY_HERE</code> with the key you copied</li>
+                    <li>Save the file</li>
+                </ol>
+                <p style="margin-top: 15px;"><strong>Your .env should look like this:</strong></p>
+                <div class="code">VITE_SUPABASE_PROJECT_ID="yfzpcyppnobbqbpsedtm"
+VITE_SUPABASE_URL="https://yfzpcyppnobbqbpsedtm.supabase.co"
+VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</div>
+            </div>
+
+            <div class="step">
+                <h2><span class="badge">Step 3</span> Verify Setup (30 seconds)</h2>
+                <p>Open PowerShell in your project folder and run:</p>
+                <div class="code">.\verify-setup.ps1</div>
+                <p style="margin-top: 10px;">You should see ✅ green checkmarks for everything.</p>
+            </div>
+
+            <div class="step">
+                <h2><span class="badge">Step 4</span> Link Project to CLI (1 minute)</h2>
+                <p>In PowerShell, run:</p>
+                <div class="code">supabase link --project-ref yfzpcyppnobbqbpsedtm</div>
+                <p style="margin-top: 10px;">When prompted, enter your database password (from Supabase project settings).</p>
+            </div>
+
+            <div class="step">
+                <h2><span class="badge">Step 5</span> Push Database Schema (30 seconds)</h2>
+                <p>In PowerShell, run:</p>
+                <div class="code">supabase db push</div>
+                <p style="margin-top: 10px;">This creates all your tables, functions, and policies automatically.</p>
+            </div>
+
+            <div class="step">
+                <h2><span class="badge">Step 6</span> Configure Supabase Dashboard (3 minutes)</h2>
+                
+                <h3>A. Authentication URLs</h3>
+                <ol>
+                    <li>Open: <a href="https://supabase.com/dashboard/project/yfzpcyppnobbqbpsedtm/auth/url-configuration" target="_blank" class="link">Auth URL Configuration</a></li>
+                    <li>Set <strong>Site URL</strong> to: <code class="code inline">http://localhost:5173</code></li>
+                    <li>Add <strong>Redirect URL</strong>: <code class="code inline">http://localhost:5173/**</code></li>
+                    <li>Click <strong>Save</strong></li>
+                </ol>
+
+                <h3>B. Enable Email Provider</h3>
+                <ol>
+                    <li>Open: <a href="https://supabase.com/dashboard/project/yfzpcyppnobbqbpsedtm/auth/providers" target="_blank" class="link">Auth Providers</a></li>
+                    <li>Make sure <strong>Email</strong> is enabled (should be by default)</li>
+                </ol>
+
+                <h3>C. Create Storage Bucket</h3>
+                <ol>
+                    <li>Open: <a href="https://supabase.com/dashboard/project/yfzpcyppnobbqbpsedtm/storage/buckets" target="_blank" class="link">Storage Buckets</a></li>
+                    <li>Click <strong>New bucket</strong></li>
+                    <li>Name: <code class="code inline">hospital-images</code></li>
+                    <li>Make it <strong>Public</strong></li>
+                    <li>Click <strong>Create bucket</strong></li>
+                </ol>
+
+                <h3>D. Set Storage Policies</h3>
+                <ol>
+                    <li>Open: <a href="https://supabase.com/dashboard/project/yfzpcyppnobbqbpsedtm/sql/new" target="_blank" class="link">SQL Editor</a></li>
+                    <li>Copy the contents of <code class="code inline">supabase/setup-storage.sql</code> from your project</li>
+                    <li>Paste and click <strong>Run</strong></li>
+                </ol>
+            </div>
+
+            <div class="step success">
+                <h2><span class="badge">Step 7</span> Start Your App! 🎉</h2>
+                <p>In PowerShell, run:</p>
+                <div class="code">npm run dev</div>
+                <p style="margin-top: 10px;">Your app will be available at: <a href="http://localhost:5173" target="_blank" class="link">http://localhost:5173</a></p>
+            </div>
+
+            <div class="step">
+                <h2>✅ Final Checklist</h2>
+                <ul class="checklist">
+                    <li>☐ API key copied from Supabase Dashboard</li>
+                    <li>☐ .env file updated with real API key</li>
+                    <li>☐ verify-setup.ps1 shows all green checkmarks</li>
+                    <li>☐ Project linked with supabase link</li>
+                    <li>☐ Schema pushed with supabase db push</li>
+                    <li>☐ Auth URL settings configured</li>
+                    <li>☐ Email provider enabled</li>
+                    <li>☐ Storage bucket created (hospital-images)</li>
+                    <li>☐ Storage policies executed</li>
+                    <li>☐ Dev server starts successfully</li>
+                    <li>☐ Can create new account</li>
+                    <li>☐ Can sign in</li>
+                </ul>
+            </div>
+
+            <div class="step warning">
+                <h2>🆘 Troubleshooting</h2>
+                
+                <h3>"Invalid API key" Error</h3>
+                <ul>
+                    <li>Make sure you copied the <strong>anon/public key</strong>, not service_role</li>
+                    <li>Check for extra spaces in .env file</li>
+                    <li>Restart dev server after updating .env</li>
+                </ul>
+
+                <h3>"Failed to link project"</h3>
+                <ul>
+                    <li>Login first: <code class="code inline">supabase login</code></li>
+                    <li>Check database password in project settings</li>
+                </ul>
+
+                <h3>Storage upload fails</h3>
+                <ul>
+                    <li>Verify bucket is <strong>public</strong></li>
+                    <li>Run setup-storage.sql again</li>
+                    <li>Check bucket name is exactly: <code class="code inline">hospital-images</code></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Afaya CareLink</strong> - Healthcare Made Accessible</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                For detailed documentation, see: START_HERE.md, QUICK_START.md, or SUPABASE_MIGRATION_GUIDE.md
+            </p>
+        </div>
+    </div>
+</body>
+</html>

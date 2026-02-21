@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Phone & Country Storage - Quick Update</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .step {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            border-radius: 8px;
+        }
+        .step h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        .step ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .step li {
+            margin-bottom: 10px;
+        }
+        .success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+        .big-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: transform 0.2s;
+        }
+        .big-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Quick Fix</h1>
+            <p>Update Database to Store Phone & Country</p>
+        </div>
+
+        <div class="content">
+            <div class="warning">
+                <h2>📌 Issue Found</h2>
+                <p><strong>Phone number and country are not being stored during signup.</strong></p>
+                <p style="margin-top: 10px;">This happens because the database trigger wasn't configured to extract these fields from user metadata.</p>
+            </div>
+
+            <div class="success">
+                <h2>✅ Fix Ready</h2>
+                <p><strong>The code has been updated!</strong> Now you just need to run one SQL command to update the database.</p>
+            </div>
+
+            <div class="step">
+                <h2><span class="badge">Step 1</span> Run the Update Script (1 Minute)</h2>
+                <ol>
+                    <li>Open Supabase SQL Editor:<br>
+                        <a href="https://supabase.com/dashboard/project/yfzpcyppnobbqbpsedtm/sql/new" target="_blank" class="big-button" style="font-size: 1em; padding: 10px 20px; margin-top: 10px;">
+                            🚀 Open SQL Editor
+                        </a>
+                    </li>
+                    <li style="margin-top: 20px;">Copy the contents of this file:<br>
+                        <code style="background: #e9ecef; padding: 5px 10px; border-radius: 4px;">
+                            supabase/migrations/20260221000001_fix_phone_country_storage.sql
+                        </code>
+                    </li>
+                    <li>Paste into SQL Editor</li>
+                    <li>Click <strong>"RUN"</strong></li>
+                    <li>Should see "Success" message</li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <h2><span class="badge">Step 2</span> Verify the Fix</h2>
+                <p>Test with a new signup:</p>
+                <ol>
+                    <li>Go to: <a href="http://localhost:5173/auth" target="_blank" style="color: #667eea;">http://localhost:5173/auth</a></li>
+                    <li>Sign up with a new email</li>
+                    <li>Fill in phone number and country</li>
+                    <li>After signup, check Supabase:</li>
+                </ol>
+                
+                <p style="margin-top: 15px;"><strong>Check in Supabase Dashboard:</strong></p>
+                <ol>
+                    <li>Go to: <a href="https://supabase.com/dashboard/project/yfzpcyppnobbqbpsedtm/editor" target="_blank" style="color: #667eea;">Table Editor</a></li>
+                    <li>Open <strong>profiles</strong> table</li>
+                    <li>Find your new user</li>
+                    <li>Verify phone and country are populated! ✅</li>
+                </ol>
+            </div>
+
+            <div class="step success">
+                <h2>🎉 What's Been Fixed</h2>
+                
+                <h3 style="margin-top: 15px; margin-bottom: 10px;">Frontend Changes:</h3>
+                <ul style="margin-left: 20px;">
+                    <li>✅ <strong>useAuth.tsx</strong>: Phone and country now stored in user metadata</li>
+                    <li>✅ Data passed to Supabase during signup</li>
+                </ul>
+
+                <h3 style="margin-top: 20px; margin-bottom: 10px;">Database Changes:</h3>
+                <ul style="margin-left: 20px;">
+                    <li>✅ <strong>Trigger function updated</strong>: Now extracts phone and country</li>
+                    <li>✅ Uses NULLIF to handle empty strings properly</li>
+                    <li>✅ Trims whitespace from phone and country</li>
+                </ul>
+
+                <h3 style="margin-top: 20px; margin-bottom: 10px;">How It Works Now:</h3>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li>User signs up with phone and country</li>
+                    <li>Data stored in user metadata</li>
+                    <li>When user confirms email, trigger fires</li>
+                    <li>Trigger extracts: full_name, email, phone, country</li>
+                    <li>Creates profile with all data ✨</li>
+                </ol>
+            </div>
+
+            <div class="step">
+                <h2>📋 What Changed in Code</h2>
+                
+                <h3 style="margin-top: 15px; margin-bottom: 10px;">Before:</h3>
+                <div class="code">data: {
+  full_name: fullName,
+}</div>
+
+                <h3 style="margin-top: 15px; margin-bottom: 10px;">After:</h3>
+                <div class="code">data: {
+  full_name: fullName,
+  phone: phone || '',
+  country: country || '',
+}</div>
+
+                <h3 style="margin-top: 20px; margin-bottom: 10px;">Database Trigger Before:</h3>
+                <div class="code">INSERT INTO profiles (user_id, full_name, email)
+VALUES (NEW.id, full_name, NEW.email)</div>
+
+                <h3 style="margin-top: 15px; margin-bottom: 10px;">Database Trigger After:</h3>
+                <div class="code">INSERT INTO profiles (user_id, full_name, email, phone, country)
+VALUES (
+  NEW.id, 
+  full_name, 
+  NEW.email,
+  NULLIF(TRIM(NEW.raw_user_meta_data->>'phone'), ''),
+  NULLIF(TRIM(NEW.raw_user_meta_data->>'country'), '')
+)</div>
+            </div>
+
+            <div class="warning">
+                <h2>⚠️ For Existing Users</h2>
+                <p>If you have users who already signed up but are missing phone/country data:</p>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li>They can update their profile after login</li>
+                    <li>Go to Profile page and fill in missing info</li>
+                    <li>Or you can manually update in Supabase Table Editor</li>
+                </ol>
+                <p style="margin-top: 15px;"><strong>New signups from now on will automatically have phone and country saved! ✅</strong></p>
+            </div>
+
+            <div class="step">
+                <h2>✅ Quick Checklist</h2>
+                <ul style="list-style: none; margin-left: 0;">
+                    <li>☐ Opened SQL Editor</li>
+                    <li>☐ Copied fix migration file</li>
+                    <li>☐ Pasted and ran in SQL Editor</li>
+                    <li>☐ Saw "Success" message</li>
+                    <li>☐ Tested with new signup</li>
+                    <li>☐ Verified phone stored in profiles table</li>
+                    <li>☐ Verified country stored in profiles table</li>
+                    <li>☐ All working! 🎉</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

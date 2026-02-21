@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Hospitals from "./pages/Hospitals";
 import HospitalProfile from "./pages/HospitalProfile";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import ConsultationRequest from "./pages/ConsultationRequest";
 import MyConsultations from "./pages/MyConsultations";
 import ConsultationDetails from "./pages/ConsultationDetails";
@@ -28,11 +29,11 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
+          <Routes>            <Route path="/" element={<Index />} />
             <Route path="/hospitals" element={<Hospitals />} />
             <Route path="/hospitals/:id" element={<HospitalProfile />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/consultation/:hospitalId" element={<ConsultationRequest />} />
             <Route path="/my-consultations" element={<MyConsultations />} />
             <Route path="/consultation-details/:id" element={<ConsultationDetails />} />

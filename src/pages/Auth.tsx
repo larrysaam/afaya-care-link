@@ -13,9 +13,17 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Lock, User, Phone, Globe } from 'lucide-react';
-import platformLogo from '@/assets/platform-logo.png';
+import platformLogo from '@/assets/logo.png';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email address" }),
@@ -50,6 +58,10 @@ const africanCountries = [
 const Auth = () => {
   const [activeTab, setActiveTab] = useState('login');
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState('');
   const { user, signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -90,9 +102,7 @@ const Auth = () => {
       });
       navigate('/');
     }
-  };
-
-  const handleSignup = async (data: SignupFormData) => {
+  };  const handleSignup = async (data: SignupFormData) => {
     setIsLoading(true);
     const { error } = await signUp(data.email, data.password, data.fullName, data.phone, data.country);
     setIsLoading(false);
@@ -108,19 +118,63 @@ const Auth = () => {
         variant: "destructive",
       });
     } else {
+      // Show confirmation dialog and switch to login tab
+      setConfirmationEmail(data.email);
+      setShowConfirmationDialog(true);
+      setActiveTab('login');
+      signupForm.reset();
+      
       toast({
         title: "Account created!",
-        description: "Welcome to AfayaConekt. You are now logged in.",
+        description: "Please check your email to confirm your account.",
       });
-      navigate('/');
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!resetEmail.trim()) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Password reset email sent",
+        description: "Check your email for a link to reset your password.",
+      });
+      
+      setShowForgotPassword(false);
+      setResetEmail('');
+    } catch (error: any) {
+      toast({
+        title: "Failed to send reset email",
+        description: error.message || "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+    <div className="min-h-screen flex flex-col bg-background">      <Header />
       
-      <main className="flex-1 flex items-center justify-center py-12 px-4">
+      <main className="flex-1 flex items-center justify-center py-12 px-4 pt-28 lg:pt-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -164,11 +218,19 @@ const Auth = () => {
                         <Input id="login-password" type="password" placeholder="••••••••" className="pl-10" {...loginForm.register('password')} />
                       </div>
                       {loginForm.formState.errors.password && <p className="text-sm text-destructive">{loginForm.formState.errors.password.message}</p>}
-                    </div>
-
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+                    </div>                    <Button type="submit" className="w-full" disabled={isLoading}>
                       {isLoading ? 'Signing in...' : 'Sign In'}
                     </Button>
+
+                    <div className="text-center mt-4">
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotPassword(true)}
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Forgot your password?
+                      </button>
+                    </div>
                   </form>
                 </TabsContent>
 
@@ -242,13 +304,106 @@ const Auth = () => {
                 </TabsContent>
               </CardContent>
             </Tabs>
-          </Card>
-
-          <p className="text-center text-sm text-muted-foreground mt-6">
+          </Card>          <p className="text-center text-sm text-muted-foreground mt-6">
             By continuing, you agree to our Terms of Service and Privacy Policy.
           </p>
         </motion.div>
       </main>
+
+      {/* Forgot Password Dialog */}
+      <Dialog open={showForgotPassword} onOpenChange={setShowForgotPassword}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Reset your password</DialogTitle>
+            <DialogDescription>
+              Enter your email address and we'll send you a link to reset your password.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleForgotPassword}>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    className="pl-10"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowForgotPassword(false)}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? 'Sending...' : 'Send reset link'}
+              </Button>
+            </DialogFooter>
+          </form>        </DialogContent>
+      </Dialog>
+
+      {/* Email Confirmation Dialog */}
+      <Dialog open={showConfirmationDialog} onOpenChange={setShowConfirmationDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center">📧 Confirm Your Email</DialogTitle>
+            <DialogDescription className="text-center pt-4">
+              We've sent a confirmation email to:
+              <div className="font-semibold text-foreground mt-2">
+                {confirmationEmail}
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+              <p className="text-sm text-muted-foreground">
+                <strong className="text-foreground">Next steps:</strong>
+              </p>
+              <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
+                <li>Check your email inbox (and spam folder)</li>
+                <li>Click the confirmation link in the email</li>
+                <li>Return here to sign in</li>
+              </ol>
+            </div>
+            <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-sm text-blue-900 dark:text-blue-100">
+                <strong>Important:</strong> You must confirm your email before you can sign in.
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="flex-col sm:flex-col gap-2">
+            <Button
+              onClick={() => setShowConfirmationDialog(false)}
+              className="w-full"
+            >
+              Got it! I'll check my email
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowConfirmationDialog(false);
+                setShowForgotPassword(true);
+                setResetEmail(confirmationEmail);
+              }}
+              className="w-full"
+              size="sm"
+            >
+              Didn't receive the email? Resend
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

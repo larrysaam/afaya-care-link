@@ -77,10 +77,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch {
       setUserRoles([]);
     }
-  };
-
-  const signUp = async (email: string, password: string, fullName: string, phone?: string, country?: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+  };  const signUp = async (email: string, password: string, fullName: string, phone?: string, country?: string) => {
+    const redirectUrl = `${window.location.origin}/auth`;
     
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -89,25 +87,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
+          phone: phone || '',
+          country: country || '',
         }
       }
     });
 
     if (!error && data.user) {
-      // Create profile
-      await supabase.from('profiles').insert({
-        user_id: data.user.id,
-        full_name: fullName,
-        email: email,
-        phone: phone || null,
-        country: country || null,
-      });
+      // Only create profile if email is confirmed OR if confirmations are disabled
+      // If confirmation is required, the profile will be created after email verification
+      const emailConfirmed = data.user.confirmed_at !== null;
+      
+      if (emailConfirmed) {
+        // Create profile immediately (email confirmation disabled)
+        await supabase.from('profiles').insert({
+          user_id: data.user.id,
+          full_name: fullName,
+          email: email,
+          phone: phone || null,
+          country: country || null,
+        });
 
-      // Assign patient role by default
-      await supabase.from('user_roles').insert({
-        user_id: data.user.id,
-        role: 'patient',
-      });
+        // Assign patient role by default
+        await supabase.from('user_roles').insert({
+          user_id: data.user.id,
+          role: 'patient',
+        });
+      }
+      // If email confirmation is required, profile will be created by database trigger
+      // which will extract phone and country from user metadata
     }
 
     return { error: error as Error | null };

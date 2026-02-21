@@ -1,5 +1,5 @@
 import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
-import platformLogo from "@/assets/platform-logo.png";
+import siteLogo from "@/assets/logo.png";
 
 const footerLinks = {
   patients: {
@@ -55,10 +55,9 @@ export const Footer = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Top Section */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12 mb-12">
-          {/* Brand Column */}
-          <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-6 lg:mb-0">
+          {/* Brand Column */}          <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-6 lg:mb-0">
             <a href="/" className="flex items-center gap-2 mb-4">
-              <img src={platformLogo} alt="AfayaConekt Logo" className="w-10 h-10 rounded-xl object-cover" />
+              <img src={siteLogo} alt="AfayaConekt Logo" className="w-10 h-10 rounded-xl object-cover" />
               <span className="font-display font-bold text-xl">
                 Afaya<span className="text-secondary">Conekt</span>
               </span>
