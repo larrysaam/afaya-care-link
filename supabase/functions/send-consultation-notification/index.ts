@@ -52,10 +52,8 @@ const handler = async (req: Request): Promise<Response> => {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true
-    });
-
-    const emailResponse = await resend.emails.send({
-      from: "Afaya Care Link <onboarding@resend.dev>",
+    });    const emailResponse = await resend.emails.send({
+      from: "AfayaConekt <onboarding@resend.dev>",
       to: [patientEmail],
       subject: "Your Medical Consultation Has Been Scheduled",
       html: `
@@ -128,16 +126,19 @@ const handler = async (req: Request): Promise<Response> => {
             <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
               If you need to reschedule or have any questions, please contact our support team.
             </p>
-            
-            <p style="margin-top: 30px;">
+              <p style="margin-top: 30px;">
               Best regards,<br>
-              <strong>The Afaya Care Link Team</strong>
+              <strong>The AfayaConekt Team</strong>
             </p>
           </div>
           
           <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
-            <p>© 2025 Afaya Care Link. All rights reserved.</p>
+            <p>© 2025 AfayaConekt. All rights reserved.</p>
             <p>This email was sent regarding your scheduled medical consultation.</p>
+            <p style="margin-top: 10px;">
+              Contact us: <a href="mailto:contact@afayaconekt.care" style="color: #0d9488;">contact@afayaconekt.care</a><br>
+              📱 +237 670 758 611 (Cameroon) | +91 70079 79670 (India)
+            </p>
           </div>
         </body>
         </html>

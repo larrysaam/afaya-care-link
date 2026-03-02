@@ -39,9 +39,7 @@ export const CTASection = () => {
             <p className="text-lg text-secondary-foreground/80 max-w-2xl mx-auto mb-8">
               Create your free account today and get access to India's best hospitals, 
               secure medical record storage, and personalized care coordination.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+            </p>            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Button 
                 asChild
                 size="xl" 
@@ -58,19 +56,23 @@ export const CTASection = () => {
                 size="xl"
                 className="border-2 border-charcoal/30 text-charcoal hover:bg-charcoal/10"
               >
-                <a href="mailto:care@afayaconekt.com">Contact Our Team</a>
+                <a href="mailto:contact@afayaconekt.care">Contact Our Team</a>
               </Button>
             </div>
 
             {/* Contact Info */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-secondary-foreground/70">
-              <a href="tel:+911234567890" className="flex items-center gap-2 hover:text-secondary-foreground transition-colors">
+              <a href="tel:+237670758611" className="flex items-center gap-2 hover:text-secondary-foreground transition-colors">
                 <Phone className="w-4 h-4" />
-                <span>+91 123 456 7890</span>
+                <span>+237 670 758 611</span>
               </a>
-              <a href="mailto:care@afayaconekt.com" className="flex items-center gap-2 hover:text-secondary-foreground transition-colors">
+              <a href="tel:+917007979670" className="flex items-center gap-2 hover:text-secondary-foreground transition-colors">
+                <Phone className="w-4 h-4" />
+                <span>+91 70079 79670</span>
+              </a>
+              <a href="mailto:contact@afayaconekt.care" className="flex items-center gap-2 hover:text-secondary-foreground transition-colors">
                 <Mail className="w-4 h-4" />
-                <span>care@afayaconekt.com</span>
+                <span>contact@afayaconekt.care</span>
               </a>
             </div>
           </div>

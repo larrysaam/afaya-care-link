@@ -258,7 +258,7 @@ const Auth = () => {
                       <Label htmlFor="signup-phone">Phone Number</Label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input id="signup-phone" type="tel" placeholder="+234 800 000 0000" className="pl-10" {...signupForm.register('phone')} />
+                        <Input id="signup-phone" type="tel" placeholder="+237 670 758 611" className="pl-10" {...signupForm.register('phone')} />
                       </div>
                       {signupForm.formState.errors.phone && <p className="text-sm text-destructive">{signupForm.formState.errors.phone.message}</p>}
                     </div>

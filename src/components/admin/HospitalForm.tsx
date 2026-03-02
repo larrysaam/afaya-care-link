@@ -277,7 +277,7 @@ export function HospitalForm({ hospital, onSuccess }: HospitalFormProps) {
                 id="phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+91 22 1234 5678"
+                placeholder="+91 70079 79670"
               />
             </div>
             <div className="space-y-2">

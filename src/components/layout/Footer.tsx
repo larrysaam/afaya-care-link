@@ -54,17 +54,35 @@ export const Footer = () => {
     <footer className="bg-charcoal text-primary-foreground">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Top Section */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12 mb-12">
-          {/* Brand Column */}          <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-6 lg:mb-0">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12 mb-12">          {/* Brand Column */}          <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-6 lg:mb-0">
             <a href="/" className="flex items-center gap-2 mb-4">
               <img src={siteLogo} alt="AfayaConekt Logo" className="w-10 h-10 rounded-xl object-cover" />
               <span className="font-display font-bold text-xl">
                 Afaya<span className="text-secondary">Conekt</span>
               </span>
             </a>
-            <p className="text-primary-foreground/60 text-sm leading-relaxed mb-6">
+            <p className="text-primary-foreground/60 text-sm leading-relaxed mb-4">
               Bridging African patients to world-class healthcare in India. Your health journey, simplified.
             </p>
+            <div className="text-primary-foreground/60 text-sm space-y-2 mb-6">
+              <div className="flex items-start gap-2">
+                <span className="font-medium">📧</span>
+                <a href="mailto:contact@afayaconekt.care" className="hover:text-primary-foreground transition-colors">
+                  contact@afayaconekt.care
+                </a>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="font-medium">📱</span>
+                <div className="space-y-1">
+                  <a href="tel:+237670758611" className="block hover:text-primary-foreground transition-colors">
+                    +237 670 758 611 (Cameroon)
+                  </a>
+                  <a href="tel:+917007979670" className="block hover:text-primary-foreground transition-colors">
+                    +91 70079 79670 (India)
+                  </a>
+                </div>
+              </div>
+            </div>
             {/* Social Links */}
             <div className="flex items-center gap-3">
               {socialLinks.map((social, index) => (
